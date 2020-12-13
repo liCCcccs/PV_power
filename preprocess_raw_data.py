@@ -18,7 +18,7 @@ def process_time(time):
 
 
 def read_csv_to_numpy(filename, prefix):
-    raw_data = pd.read_csv(prefix + filename, sep=',', header=1).values  # read to a list
+    raw_data = pd.read_csv(prefix + filename, sep=',', header=0).values  # read to a list
     data_length = raw_data.shape[0]
     my_data = np.zeros([data_length, 3])   # create a empty numpy array for processed data
     for line in range(data_length):
@@ -34,7 +34,7 @@ def read_csv_to_numpy(filename, prefix):
             std_time = process_time(raw_time)
 
         if raw_data[line, POWER_COL] == "-":
-            print(line)
+            print(line)  # just in case there are some missing power data
         std_power = float(raw_data[line, POWER_COL][:-1].replace(",", ""))
         if raw_data[line, TEMP_COL] is not "-":
             std_temperature = float(raw_data[line, TEMP_COL][:-1])
@@ -50,15 +50,16 @@ def read_csv_to_numpy(filename, prefix):
         my_data[data_length - line - 1, 1] = std_temperature
         my_data[data_length - line - 1, 2] = std_power
 
-    np.savetxt("./data/data_2in1out/" + filename, my_data, delimiter=",")
+    np.savetxt("./data/processed/data_2in1out/" + filename, my_data, delimiter=",")
 
 
 def main():
-    all_files = [f for f in listdir("./data/") if isfile(join("./data/", f))]
+    raw_data_dir = "./data/raw_data/"
+    all_files = [f for f in listdir(raw_data_dir) if isfile(join(raw_data_dir, f))]
 
-    for filename in sorted(all_files):
+    for filename in all_files:
         print("Processing: " + filename)
-        read_csv_to_numpy(filename, prefix="./data/")
+        read_csv_to_numpy(filename, prefix=raw_data_dir)
 
 
 if __name__ == '__main__':
