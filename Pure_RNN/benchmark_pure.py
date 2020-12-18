@@ -19,21 +19,22 @@ def main():
 
     X_keep = np.zeros([X_train.shape[0], 1])
     for i in range(X_train.shape[0]):
-        X_keep[i, :] = np.full(1, X_train[i, -1, 2])
+        X_keep[i, 0] = X_train[i, -1, 0]
 
     X_true = Y_train
     print(X_keep.shape)
     print(X_true.shape)
 
-    plt.plot(np.arange(0, seq_length), X_train[6, :, 2])
-    plt.plot(X_true[6, :], '*')  #  TODO: benchmark
-    plt.plot(np.arange(100, 110), X_keep[6, :])
-    #plt.show()
+    index = 12
+    plt.plot(np.arange(0, seq_length), X_train[index, :, 0])
+    plt.plot(seq_length, X_true[index], 'b*')
+    plt.plot(seq_length, X_keep[index], 'rx')
+    plt.show()
 
     mse = ((X_true - X_keep) ** 2).mean(axis=None)
     mse2 = keras.metrics.mean_squared_error(X_true, X_keep)
     print("mse: ", mse)
-    print("mse2: ", tf.reduce_sum(mse2) / 4)
+    print("mse2: ", tf.reduce_sum(mse2) / len(X_true))
 
 
 

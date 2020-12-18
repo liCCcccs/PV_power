@@ -2,6 +2,7 @@ import tensorflow as tf
 from tensorflow import keras
 import pandas as pd
 import numpy as np
+from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 
 
@@ -78,6 +79,33 @@ def get_data_unscaled_pure_vec(filename, seq_length, interval):
         Y_valid[batch] = X_valid_raw[batch*interval + seq_length: batch*interval + seq_length + 1, 2]
     for batch in range(num_batch_test):
         Y_test[batch] = X_test_raw[batch*interval + seq_length: batch*interval + seq_length + 1, 2]
+    X_train /= 10000
+    X_valid /= 10000
+    X_test /= 10000
+    Y_train /= 10000
+    Y_valid /= 10000
+    Y_test /= 10000
+
+    return X_train, X_valid, X_test, Y_train, Y_valid, Y_test
+
+
+def get_data_unscaled_pure_vec_shaffle(filename, seq_length, interval):
+    """ For seq2vec model, only predict one step ahead """
+    raw_data = pd.read_csv(filename, sep=',', header=None).values  # read to a list
+    raw_data = np.array(raw_data)  # leave the last 10 data points for y
+    num_batch = (raw_data.shape[0] - seq_length - 1) // interval  # include the one predict step
+
+    X_all = np.zeros([num_batch, seq_length, 1])
+    for batch in range(num_batch):
+        X_all[batch, :, 0] = raw_data[batch*interval:batch*interval + seq_length, 2]
+
+    Y_all = np.zeros([num_batch, 1])
+    for batch in range(num_batch):
+        Y_all[batch] = raw_data[batch*interval + seq_length: batch*interval + seq_length + 1, 2]
+
+    X_train_full, X_test, Y_train_full, Y_test = train_test_split(X_all, Y_all, test_size=0.1, random_state=42)
+    X_train, X_valid, Y_train, Y_valid = train_test_split(X_train_full, Y_train_full, test_size=0.25, random_state=42)
+
     X_train /= 10000
     X_valid /= 10000
     X_test /= 10000
