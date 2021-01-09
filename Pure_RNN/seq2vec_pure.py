@@ -30,6 +30,7 @@ def create_model_deep_rnn(seq_length):
         keras.layers.GRU(15),
         keras.layers.Dense(1)
     ])
+    model.summary()
     return model
 
 
@@ -65,13 +66,13 @@ def main():
     print(Y_test.shape)
     print(X_train[1])
     print(Y_train[1])
-    model = create_model_deep_rnn(seq_length)
+    model = create_model_rnn(seq_length)
     model.compile(loss="mse", optimizer=keras.optimizers.Adam(lr=0.005))
 
     early_stopping = get_callbacks(["save_best_only"])
     exponential_decay_fn = exponential_decay(lr0=0.01, s=100)  # 10 times smaller after s epochs
     lr_scheduler = keras.callbacks.LearningRateScheduler(exponential_decay_fn)  # Automatically carry lr0 to next epoch
-    history = model.fit(X_train, Y_train, batch_size=32, epochs=100, validation_data=(X_valid, Y_valid),
+    history = model.fit(X_train, Y_train, batch_size=32, epochs=10, validation_data=(X_valid, Y_valid),
                         callbacks=[lr_scheduler, early_stopping])
     y_pred = model.predict(X_train[:1])
     print("y_pred: ", y_pred)
