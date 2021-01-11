@@ -1,4 +1,5 @@
 import logging
+from tensorflow.keras.optimizers import Adam, Nadam, RMSprop
 
 
 class ModelBase():
@@ -21,6 +22,15 @@ class ModelBase():
         else:
             self._model = self.build_model(self.input_shape)
 
+        if not self._is_predict:
+            self._compile_model()
+
     def build_model(self, inputs):
         """ Override for Model Specific autoencoder builds """
         raise NotImplementedError
+
+    def _compile_model(self):
+        """ Compile the model to include the Optimizer and Loss Function(s) """
+        # TODO: add config file
+        optimizer = Adam(learning_rate=0.01)
+        self._model.compile(optimizer=optimizer, loss="mse")

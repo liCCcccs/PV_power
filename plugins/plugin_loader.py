@@ -9,6 +9,10 @@ class PluginLoader():
         return PluginLoader._import("train.model", name, disable_logging)
 
     @staticmethod
+    def get_trainer(name, disable_logging=False):
+        return PluginLoader._import("train.trainer", name, disable_logging)
+
+    @staticmethod
     def _import(attr, name, disable_logging):
         ttl = attr.split(".")[-1].title()  # ttl = Model
         mod = ".".join(["plugins", attr.lower(), name])

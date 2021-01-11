@@ -39,6 +39,12 @@ class TrainArgs():
             default="NN2in2out",
             group="Global Options",
             help="Specify the model you want to use"))
+        global_args.append(dict(
+            opts=("-bs", "--batch_size"),
+            dest="batch_size",
+            default=16,
+            group="Global Options",
+            help="Batch size"))
         return global_args
 
     def _add_arguments(self):
