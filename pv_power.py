@@ -17,6 +17,8 @@ def _main():
     """ The main entry point of pv_power """
     subparser = _PARSER.add_subparsers()
     args.TrainArgs(subparser, "train")
+    args.InspectArgs(subparser, "inspect")
+
     _PARSER.set_defaults()
     arguments = _PARSER.parse_args()
     arguments.func(arguments)

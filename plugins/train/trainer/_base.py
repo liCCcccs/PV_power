@@ -1,4 +1,5 @@
 import logging
+from lib.training_data import TrainingDataGenerator
 
 
 class TrainerBase():
@@ -8,23 +9,24 @@ class TrainerBase():
         self._data_dir = data_dir
         self._batch_size = batch_size
         self._feeder = self._Feeder(self._data_dir,
-                     self._model)  # return a tensorflow Dataset
+                                    self._model,
+                                    self._batch_size)  # return a tensorflow Dataset
 
-    def train_one_step(self):
-        # TODO: implement tf.Dataset next() in get_batch()
-        model_inputs, model_targets = self._feeder.get_batch()
-        loss = self._model.model.train_on_batch(model_inputs, y=model_targets)
+    def train_cycle(self, epochs):
+        train_set = self._feeder.get_dataset()
+        history = self._model.model.fit(train_set, epochs=epochs, steps_per_epoch=100)  # TODO: check this 100
 
     class _Feeder():
-        def __init__(self, data_dir, model):
+        def __init__(self, data_dir, model, batch_size):
             self._model = model
             self._data_dir = data_dir
-            self._feeds = self._load_generator()
+            self._feeds = self._load_generator().generate_dataset(data_dir, batch_size)
 
         def _load_generator(self):
-            input_size = self._model.model.input_shape[0]
+            input_size = self._model.model.input_shape[1]  # model.input_shape = (None, n)
             generator = TrainingDataGenerator(input_size)
+            return generator
 
-        def get_batch(self):
-            pass
+        def get_dataset(self):
+            return self._feeds
 
