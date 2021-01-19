@@ -20,7 +20,10 @@ def _main():
     args.InspectArgs(subparser, "inspect")
 
     _PARSER.set_defaults()
-    arguments = _PARSER.parse_args()
+    arguments = _PARSER.parse_args(["inspect",
+                                    "-o", "1",
+                                    "-s", "2018/12/28",
+                                    "-e", "2019/1/3"])
     arguments.func(arguments)
 
 

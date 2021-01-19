@@ -77,7 +77,7 @@ class InspectArgs(PVArgs):
         argument_list.append(dict(
             opts=("-fp", "--file_path"),
             dest="file_path",
-            default="./data/new_data.csv",
+            default="./data/Yulara",
             group="Plugins",
             help="Specify the file path of the data"))
         argument_list.append(dict(
