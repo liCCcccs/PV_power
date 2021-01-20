@@ -9,23 +9,21 @@ import matplotlib.pyplot as plt
 logger = logging.getLogger(__name__)
 
 
-class Inspector():
+class LocationBase():
     def __init__(self, filepath, option, start_date, end_date):
         # TODO: is_all... maybe we don't
         self._filepath = filepath
         self._option = option
-        self._write_start_end_date(start_date, end_date)
-        self._files = self._file_to_read()
-        self._read_from_csv()
-        print("=======", self._data.shape)
-        self._feature = {"wind_speed": 0, "temperature": 1, "radiation": 2, "wind_direction": 3, "rainfall": 4,
-                         "max_wind_speed": 5, "air_pressure": 6, "hail_accumulation": 7, "pyranometer_1": 8,
-                         "temperature_probe_1": 9, "temperature_probe_2": 10, "AEDR": 11, "Active_Power": 12}
-        self._inv_feature = {v: k for k, v in self._feature.items()}
+        self._start_date = start_date
+        self._end_date = end_date
+        self._feature = None   # implemented in children class
+        self._inv_feature = None   # implemented in children class
+        self._date_separator = None  # implemented in children class
+        print("========", self._date_separator)
 
-    def _write_start_end_date(self, start_date, end_date):
-        start_args = (int(x) for x in re.split("[/ :]", start_date))
-        end_args = (int(x) for x in re.split("[/ :]", end_date))
+    def _write_start_end_date(self):
+        start_args = (int(x) for x in re.split(self._date_separator, self._start_date))
+        end_args = (int(x) for x in re.split(self._date_separator, self._end_date))
         self._start_date = datetime.datetime(*start_args)
         self._end_date = datetime.datetime(*end_args)
 
@@ -33,19 +31,9 @@ class Inspector():
         years = list(range(self._start_date.year, self._end_date.year + 1))
         data_name = os.path.split(self._filepath)[-1]
         files = [os.path.join(self._filepath, data_name + "_" + str(year) + ".csv") for year in years]
-        print(files)
-        return files
+        self._files = files
 
-    def _read_filter_csv(self, index, start_row=0, end_row=None):
-        # TODO: return the actual start and end date
-        data = np.loadtxt(self._files[index], delimiter=",", dtype=object)[:, 1:].astype(float)
-        if end_row is None:
-            data = data[start_row:, :]
-        else:
-            data = data[start_row: end_row + 1, :]
-        return data
-
-    def _read_from_csv(self):
+    def _load_data_from_file(self):
         if len(self._files) == 0:
             raise ValueError("Please input correct year.")
         elif len(self._files) == 1:
@@ -71,6 +59,9 @@ class Inspector():
                     raise Exception("File not found: ", self._files[index])
 
     def process(self):
+        self._write_start_end_date()
+        self._file_to_read()
+        self._load_data_from_file()
         print("Number of data points been inspected: ", self._data.shape[0])
 
         if self._option == 1:
@@ -84,7 +75,7 @@ class Inspector():
 
     def _plot_2(self, col1, col2):
         plt.plot(self._data[:, col1])
-        # plt.plot(self._data[:, col2])
+        plt.plot(self._data[:, col2])
         plt.show()
 
     def _get_relevance(self, n):
@@ -93,6 +84,15 @@ class Inspector():
             y = self._data[:, i]
             r = (n * np.sum(x*y) - np.sum(x) * np.sum(y)) / np.sqrt((n * np.sum(x*x) - np.sum(x)*(np.sum(x))) * (n * np.sum(y*y) - np.sum(y)*(np.sum(y))) )
             print("Relevance: power and " + self._inv_feature[i], r)
+
+    def _read_filter_csv(self, index, start_row=0, end_row=None):
+        # TODO: return the actual start and end date
+        data = np.loadtxt(self._files[index], delimiter=",", dtype=object)[:, 1:].astype(float)
+        if end_row is None:
+            data = data[start_row:, :]
+        else:
+            data = data[start_row: end_row + 1, :]
+        return data
 
     def _search_one_row(self, filename, is_start):
         """ Return the row number of the start_date or end_date in the file
