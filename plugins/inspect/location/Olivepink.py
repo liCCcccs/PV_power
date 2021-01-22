@@ -12,6 +12,3 @@ class Location(LocationBase):
         self._inv_feature = {v: k for k, v in self._feature.items()}
         self._date_separator = "[/ :]"
         print("Initialized")
-
-    def get_feature_name(self):
-        return self._feature

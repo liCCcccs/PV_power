@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class LocationBase():
-    def __init__(self, filepath, option, start_date, end_date):
+    def __init__(self, filepath=None, option=1, start_date=None, end_date=None):
         # TODO: is_all... maybe we don't
         self._filepath = filepath
         self._option = option
