@@ -21,10 +21,10 @@ def _main():
 
     _PARSER.set_defaults()
     arguments = _PARSER.parse_args(["inspect",
-                                    "-fp", "./data/Olivepink",
+                                    "-fp", "./data/Yulara",
                                     "-o", "2",
-                                    "-s", "2016/4/28",
-                                    "-e", "2016/4/29"])
+                                    "-s", "2020/09/01",
+                                    "-e", "2020/11/29"])
     arguments.func(arguments)
 
 
